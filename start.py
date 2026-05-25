@@ -26,7 +26,15 @@ while True:
     if choice == "1":
         client_name = input("Имя клиента: ")
         client_phone = input("Телефон клиента: ")
-        client_budget = int(input("Бюджет клиента (грн): "))
+        if not client_phone.isdigit():
+            print("Телефон должен содержать только цифры")
+            continue
+        client_budget = input("Бюджет клиента (грн): ")
+        while not client_budget.isdigit():
+            if not client_budget.isdigit():
+                print("Бюджет должен быть числом")
+            client_budget = input("Бюджет клиента (грн): ")
+        client_budget = int(client_budget)
         new_client = Client(client_name, client_phone, client_budget)
         clients.append(new_client)
         print(f"Клиент {client_name} добавлен!")
