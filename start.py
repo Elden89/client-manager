@@ -85,21 +85,21 @@ while True:
     elif choice == "4":
         names_input = input("Введите имена для удаления (через запятую): ")
         names_remove = [name.strip() for name in names_input.split(",")]
-         with Session(engine) as session:
+        with Session(engine) as session:
             clients_remove = session.query(Client).filter(
                 Client.name.in_(names_remove)
             ).all()
-        if clients_remove:
-            removed_names = ", ".join([c.name for c in clients_remove])
-            for c in clients_remove:
-                session.delete(c)
-            session.commit()
-            print(f"Удалены клиенты: {removed_names}")
-        else:
-            print("Клиенты с такими именами не найдены")
+            if clients_remove:
+                removed_names = ", ".join([c.name for c in clients_remove])
+                for c in clients_remove:
+                    session.delete(c)
+                session.commit()
+                print(f"Удалены клиенты: {removed_names}")
+            else:
+                print("Клиенты с такими именами не найдены")
     elif choice == "5":
         print("Выход из программы")
         break
-        
+
     else:
         print("Выберите корректный пункт меню")
