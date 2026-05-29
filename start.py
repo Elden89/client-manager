@@ -100,5 +100,6 @@ while True:
     elif choice == "5":
         print("Выход из программы")
         break
+        
     else:
         print("Выберите корректный пункт меню")
