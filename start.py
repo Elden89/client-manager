@@ -91,13 +91,22 @@ while True:
             print("Клиенты не найдены")
 
     elif choice == "4":
-        client_id = input("Введите ID клиента для удаления: ")
-        while not client_id.isdigit():
-            print("ID должен быть числом")
-            client_id = input("Введите ID клиента для удаления: ")
-        client_id = int(client_id)
-
         with Session(engine) as session:
+            clients = session.query(Client).all()
+            if not clients:
+                print("Список клиентов пуст")
+                continue
+
+            print("=== Список клиентов ===")
+            for c in clients:
+                print(f"{c.id}. {c}")
+
+            client_id = input("Введите ID клиента для удаления: ")
+            while not client_id.isdigit():
+                print("ID должен быть числом")
+                client_id = input("Введите ID клиента для удаления: ")
+            client_id = int(client_id)
+
             client = session.get(Client, client_id)
             if client:
                 removed_name = client.name
