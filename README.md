@@ -12,7 +12,7 @@ Built with Python OOP + PostgreSQL + SQLAlchemy.
 3. Create .env file (see .env.example)
 
 4. Run:
-   python main.py
+   python start.py
 
 ## Stack
 Python 3 · PostgreSQL · SQLAlchemy · python-dotenv

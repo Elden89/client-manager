@@ -17,8 +17,11 @@ class Client(Base):
     phone  = Column(String(20))
     budget = Column(Integer)
 
-    def info(self):
+    def __str__(self):
         return f"{self.name} | {self.phone} | {self.budget} грн"
+
+    def __repr__(self):
+        return f"Client(name={self.name!r}, phone={self.phone!r}, budget={self.budget})"
 
 Base.metadata.create_all(engine)
 
@@ -67,7 +70,7 @@ while True:
         else:
             print("=== Список клиентов ===")
             for c in clients:
-                print(c.info())
+                print(c)
 
     elif choice == "3":
         search_name = input("Введите имя клиента для поиска: ").lower().strip()
@@ -78,7 +81,7 @@ while True:
         if results:
             print("=== Результаты поиска ===")
             for c in results:
-                print(c.info())
+                print(c)
         else:
             print("Клиенты не найдены")
 
