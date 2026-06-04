@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Session
 load_dotenv()
 
@@ -13,9 +14,9 @@ class Base(DeclarativeBase):
 class Client(Base):
     __tablename__ = "clients"
     id     = Column(Integer, primary_key=True)
-    name   = Column(String(100))
-    phone  = Column(String(20))
-    budget = Column(Integer)
+    name   = Column(String(100), nullable=False)
+    phone  = Column(String(20), nullable=False, unique=True)
+    budget = Column(Integer, nullable=False)
 
     def __str__(self):
         return f"{self.name} | {self.phone} | {self.budget} грн"
@@ -57,9 +58,13 @@ while True:
 
         with Session(engine) as session:
             new_client = Client(name=client_name, phone=client_phone, budget=int(client_budget))
-            session.add(new_client)
-            session.commit()
-        print(f"Клиент {client_name} добавлен!")
+            try:
+                session.add(new_client)
+                session.commit()
+                print(f"Клиент {client_name} добавлен!")
+            except IntegrityError:
+                session.rollback()
+                print("Клиент с таким телефоном уже существует")
     
     
     elif choice == "2":
@@ -70,7 +75,7 @@ while True:
         else:
             print("=== Список клиентов ===")
             for c in clients:
-                print(c)
+                print(f"{c.id}. {c}")
 
     elif choice == "3":
         search_name = input("Введите имя клиента для поиска: ").lower().strip()
@@ -81,25 +86,26 @@ while True:
         if results:
             print("=== Результаты поиска ===")
             for c in results:
-                print(c)
+                print(f"{c.id}. {c}")
         else:
             print("Клиенты не найдены")
 
     elif choice == "4":
-        names_input = input("Введите имена для удаления (через запятую): ")
-        names_remove = [name.strip() for name in names_input.split(",")]
+        client_id = input("Введите ID клиента для удаления: ")
+        while not client_id.isdigit():
+            print("ID должен быть числом")
+            client_id = input("Введите ID клиента для удаления: ")
+        client_id = int(client_id)
+
         with Session(engine) as session:
-            clients_remove = session.query(Client).filter(
-                Client.name.in_(names_remove)
-            ).all()
-            if clients_remove:
-                removed_names = ", ".join([c.name for c in clients_remove])
-                for c in clients_remove:
-                    session.delete(c)
+            client = session.get(Client, client_id)
+            if client:
+                removed_name = client.name
+                session.delete(client)
                 session.commit()
-                print(f"Удалены клиенты: {removed_names}")
+                print(f"Клиент {removed_name} удален")
             else:
-                print("Клиенты с такими именами не найдены")
+                print("Клиент с таким ID не найден")
     elif choice == "5":
         print("Выход из программы")
         break
