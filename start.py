@@ -19,7 +19,7 @@ class Client(Base):
     budget = Column(Integer, nullable=False)
 
     def __str__(self):
-        return f"{self.name} | {self.phone} | {self.budget} грн"
+        return f"{self.name} | {self.phone} | {self.budget} UAH"
 
     def __repr__(self):
         return f"Client(name={self.name!r}, phone={self.phone!r}, budget={self.budget})"
@@ -32,28 +32,29 @@ def valid_phone(phone):
     return phone.isdigit()
 
 while True:
-    print ("=== Менеджер Клиентов ===")
-    print("1. Добавить клиента")
-    print("2. Показать всех клиентов")
-    print("3. Найти клиента по имени")
-    print("4. Удалить клиента")
-    print("5. Выйти")
-    choice = input("Выберите действие: ")
+    print("=== Client Manager ===")
+    print("1. Add client")
+    print("2. Show all clients")
+    print("3. Find client by name")
+    print("4. Delete client")
+    print("5. Exit")
+    choice = input("Select an option: ")
+    
     if choice == "1":
-        client_name = input("Имя клиента: ").strip()
+        client_name = input("Client name: ").strip()
         while not client_name:
-            print("Имя не может быть пустым")
-            client_name = input("Имя клиента: ").strip()
+            print("Name cannot be empty")
+            client_name = input("Client name: ").strip()
 
-        client_phone = input("Телефон клиента: ")
+        client_phone = input("Client phone: ")
         while not valid_phone(client_phone):
-            print("Телефон должен содержать только цифры(и + в начале)")
-            client_phone = input("Телефон клиента: ")
+            print("Phone must contain only digits (and + at the start)")
+            client_phone = input("Client phone: ")
 
-        client_budget = input("Бюджет клиента (грн): ")
+        client_budget = input("Client budget (UAH): ")
         while not client_budget.isdigit():
-            print("Бюджет должен быть числом")
-            client_budget = input("Бюджет клиента (грн): ")
+            print("Budget must be a number")
+            client_budget = input("Client budget (UAH): ")
         client_budget = int(client_budget)
 
         with Session(engine) as session:
@@ -61,50 +62,48 @@ while True:
             try:
                 session.add(new_client)
                 session.commit()
-                print(f"Клиент {client_name} добавлен!")
+                print(f"Client {client_name} added!")
             except IntegrityError:
                 session.rollback()
-                print("Клиент с таким телефоном уже существует")
-    
+                print("Client with this phone number already exists")
     
     elif choice == "2":
         with Session(engine) as session:
             clients = session.query(Client).all()
         if not clients:
-            print("Список клиентов пуст")
+            print("Client list is empty")
         else:
-            print("=== Список клиентов ===")
+            print("=== Client List ===")
             for c in clients:
                 print(f"{c.id}. {c}")
 
     elif choice == "3":
-        search_name = input("Введите имя клиента для поиска: ").lower().strip()
+        search_name = input("Enter client name to search: ").lower().strip()
         with Session(engine) as session:
             results = session.query(Client).filter(
                 Client.name.ilike(f"%{search_name}%")
             ).all()
         if results:
-            print("=== Результаты поиска ===")
+            print("=== Search Results ===")
             for c in results:
                 print(f"{c.id}. {c}")
         else:
-            print("Клиенты не найдены")
+            print("Clients not found")
 
     elif choice == "4":
         with Session(engine) as session:
             clients = session.query(Client).all()
             if not clients:
-                print("Список клиентов пуст")
+                print("Client list is empty")
                 continue
-
-            print("=== Список клиентов ===")
+            print("=== Client List ===")
             for c in clients:
                 print(f"{c.id}. {c}")
 
-            client_id = input("Введите ID клиента для удаления: ")
+            client_id = input("Enter client ID to delete: ")
             while not client_id.isdigit():
-                print("ID должен быть числом")
-                client_id = input("Введите ID клиента для удаления: ")
+                print("ID must be a number")
+                client_id = input("Enter client ID to delete: ")
             client_id = int(client_id)
 
             client = session.get(Client, client_id)
@@ -112,11 +111,12 @@ while True:
                 removed_name = client.name
                 session.delete(client)
                 session.commit()
-                print(f"Клиент {removed_name} удален")
+                print(f"Client {removed_name} deleted")
             else:
-                print("Клиент с таким ID не найден")
+                print("Client with this ID not found")
+                
     elif choice == "5":
-        print("Выход из программы")
+        print("Exiting program")
         break
     else:
-        print("Выберите корректный пункт меню")
+        print("Please select a valid menu option")
